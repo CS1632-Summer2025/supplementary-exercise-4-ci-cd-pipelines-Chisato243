@@ -79,10 +79,10 @@ jobs:
           key: ${{ runner.os }}-sonar
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarqube-scan-action@v5.0.0
         with:
-          organization: ${{ secrets.SONAR_ORGANIZATION }}
-          projectKey: ${{ secrets.SONAR_PROJECT_KEY }}
-          projectName: "CS1632 CI/CD Pipelines Demo"
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+            -Dsonar.sources=src
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
