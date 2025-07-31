@@ -54,12 +54,13 @@ jobs:
 
       - name: Update dependency graph
         uses: advanced-security/maven-dependency-submission-action@v3
+  
   sonar_scan:
     name: SonarQube Analysis
     runs-on: ubuntu-latest
-    needs: [maven_test]         
+    needs: [maven_test]  
     permissions:
-      contents: read             
+      contents: read     
 
     steps:
       - name: Checkout code
@@ -71,11 +72,23 @@ jobs:
           java-version: '11'
           distribution: 'zulu'
 
-      - name: Run SonarQube scan
-        uses: SonarSource/sonarcloud-github-action@master  # SonarCloud
+      - name: Cache Sonar extensions
+        uses: actions/cache@v3
         with:
-          organization: ${{ secrets.SONAR_ORGANIZATION }}  # 仅 SonarCloud
-          projectKey: cs1632-cicd-pipelines                   # 你的项目 Key
-          projectName: cs1632-cicd-pipelines
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+
+      - name: Run SonarQube scan
+        run: |
+          mvn sonar:sonar \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            ${{
+              secrets.SONAR_HOST_URL && '-Dsonar.host.url=' + secrets.SONAR_HOST_URL
+            }} \
+            -Dsonar.projectKey=cs1632-cicd-pipelines \
+            -Dsonar.projectName="CI/CD Pipelines Demo"
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  
+          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}  
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}  
