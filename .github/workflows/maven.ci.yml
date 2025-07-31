@@ -72,23 +72,17 @@ jobs:
           java-version: '11'
           distribution: 'zulu'
 
-      - name: Cache Sonar extensions
+      - name: Cache SonarCloud packages
         uses: actions/cache@v3
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
 
-      - name: Run SonarQube scan
-        run: |
-          mvn sonar:sonar \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            ${{
-              secrets.SONAR_HOST_URL && '-Dsonar.host.url=' + secrets.SONAR_HOST_URL
-            }} \
-            -Dsonar.projectKey=cs1632-cicd-pipelines \
-            -Dsonar.projectName="CI/CD Pipelines Demo"
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          organization: ${{ secrets.SONAR_ORGANIZATION }}
+          projectKey: ${{ secrets.SONAR_PROJECT_KEY }}
+          projectName: "CS1632 CI/CD Pipelines Demo"
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  
-          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}  
-          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}  
